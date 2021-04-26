@@ -254,26 +254,26 @@ class JsonPair(val a: String, val b:JSonValue) :JSonValue() {
 class MyJsonObject() :JSonValue() {
 
     @VALUE
-    val newLista = mutableListOf<JsonPair>()
-    //val map : MutableMap<String,JSonValue> = mutableMapOf()
+    //val newLista = mutableListOf<JsonPair>()
+    val map : MutableMap<String,JSonValue> = mutableMapOf()
 
     @FUN_NAME
     fun addField(s: String, j: JSonValue) {
-        //map[s]=j
-        newLista.add(JsonPair(s, j))
+        map[s]=j
+        //newLista.add(JsonPair(s, j))
     }
     @FUN_NAME
     override fun serialize(): String {
 
         var resultado = ""
-        /*
+
         for((k,v) in map){
-            resultado=resultado + k.toString() +": "+ v.serialize() + "\n"
+            resultado=resultado + "\n " + "\"" + k.toString() + "\"" + ": " +v.serialize() + " \n"
         }
         return "{ " +"\n" + resultado + "\n" + "}"
-*/
 
 
+    /*
         newLista.forEach {
             if (newLista.indexOf(it) == (newLista.size - 1)) {
                 resultado = resultado + "\n " + "\"" + it.a + "\"" + ": " + it.b.serialize() + "\n"
@@ -285,6 +285,8 @@ class MyJsonObject() :JSonValue() {
 
         }
 
+
+     */
 
 
     /*
@@ -302,7 +304,9 @@ class MyJsonObject() :JSonValue() {
         override fun accept(v: Visitor) {
 
         v.visit(this)
-        newLista.forEach { it.accept(v) }
+        for((x,y) in map){
+            accept(v)
+        }
     }
 
 
@@ -321,6 +325,19 @@ class MyJsonObject() :JSonValue() {
         var final = mutableListOf<String>()
         var r= mutableListOf<String>()
 
+        for((k,v) in map) {
+            if (v is JsonArray == false) {
+                if (exp(v)) {
+                    final.add(v.serialize())
+                }
+            }
+            else{
+                r=v.searchFor(exp) as MutableList<String>
+            }
+        }
+
+        /*
+
         newLista.forEach {
             if(it.b is JsonArray == false){
                 if(exp(it.b)){
@@ -334,6 +351,8 @@ class MyJsonObject() :JSonValue() {
 
             }
         }
+
+         */
         return final+r
 /*
         for (i in newLista){
