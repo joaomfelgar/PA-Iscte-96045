@@ -1,6 +1,10 @@
 import junit.framework.TestCase
 import org.junit.Assert
 import org.junit.Test
+import kotlin.reflect.KClass
+import kotlin.reflect.full.declaredMemberProperties
+import kotlin.reflect.full.findAnnotation
+import kotlin.reflect.full.hasAnnotation
 
 class MyJsonObjectTest : TestCase(){
 
@@ -44,6 +48,7 @@ class MyJsonObjectTest : TestCase(){
         newjsononbject.addField("Palavra", jsonint)
         newjsononbject.addField("Palavra", jsonarray)
 
+
         var compare="{\n" +
                 " \n" +
                 " \"Palavra\": \"OI\" , \n" +
@@ -55,6 +60,11 @@ class MyJsonObjectTest : TestCase(){
                 "}"
 
         Assert.assertTrue(newjsononbject.serialize() == compare)
+        var clazz :KClass<*> = newjsononbject ::class as KClass<*>
+        Assert.assertTrue(clazz.findAnnotation<JsonClass>()!!.name=="JSONOBJECT")
+
+
+
 
     }
 }

@@ -39,11 +39,12 @@ class JsonArrayTest : TestCase(){
     }
 
     @Test
-    fun testSearchFor(){/*
+    fun testSearchFor(){
         testerArray.addElement(jsonstring)
         testerArray.addElement(jsonstring2)
         testerArray.addElement(jsonint)
-        */
+
+
 
 
 
@@ -56,20 +57,27 @@ class JsonArrayTest : TestCase(){
 
         testerArray.addElement(jsonarray2)
 
-        var Exist = JsonString("OI")
-        var NotExist= JsonString("NAO")
+
 
         val limite = {s:JSonValue -> s.serialize().length>=2 } //No caso de Strings as aspas contam para o tamanho da string -> "OI"->4 outros objetos não -> "2"->1
         val limite2 = {s:JSonValue -> s.serialize().length>=8 }
 
 
-        Assert.assertTrue(testerArray.searchFor(Exist,limite) == true)
+        var compare1=  mutableListOf<Any>()
+        compare1.add("\"OI\"")
+        compare1.add("\"OI2\"")
+        compare1.add("\"OI\"")
+        compare1.add("\"OI\"")
+        compare1.add("\"OI2\"")
+        var compare2=  mutableListOf<Any>()
 
-        Assert.assertTrue(testerArray.searchFor(NotExist,limite) == false)
 
-        Assert.assertTrue(testerArray.searchFor(Exist,limite2) == false)
 
-        Assert.assertTrue(testerArray.searchFor(NotExist,limite2) == false)
+        Assert.assertTrue(testerArray.searchFor(limite) == compare1)
+
+        Assert.assertTrue(testerArray.searchFor(limite2) == compare2)
+
+
 
     }
 }
