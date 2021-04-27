@@ -11,215 +11,7 @@ annotation class ChangeName(
 
 )
 @Target(AnnotationTarget.PROPERTY)
-annotation class Ignore(
-
-)
-
-
-
-
-
-abstract class JSonValue{
-    abstract fun serialize(): String
-    abstract fun accept (v:Visitor)
-
-}
-
-class JsonString(s:String): JSonValue(){
-
-    val valor=s
-
-
-    override fun serialize(): String {
-        return "\""+valor.toString()+"\""
-    }
-
-    override fun accept(v: Visitor) {
-        v.visit(this)
-    }
-
-}
-
-class JsonInt(i:Int): JSonValue(){
-
-    val valor=i
-
-
-
-    override fun serialize(): String {
-        return valor.toString()
-    }
-
-    override fun accept(v: Visitor) {
-        v.visit(this)
-    }
-
-
-}
-
-class JsonFloat (val f:Float):JSonValue(){
-
-    override fun serialize():String{
-        return f.toString()
-    }
-
-    override fun accept(v: Visitor) {
-        v.visit(this)
-    }
-}
-
-class JsonDouble (val d:Double):JSonValue(){
-
-    override fun serialize():String{
-        return d.toString()
-    }
-
-    override fun accept(v: Visitor) {
-        v.visit(this)
-    }
-}
-
-class JsonChar(val c: Char): JSonValue(){
-
-    override fun serialize(): String {
-       return "\'"+c.toString()+"\'"
-    }
-
-    override fun accept(v: Visitor) {
-        v.visit(this)
-    }
-}
-
-class JsonNull(): JSonValue(){
-
-    val n= null
-
-    override fun serialize():String{
-        return "NULL"
-    }
-
-    override fun accept(v: Visitor) {
-        v.visit(this)
-    }
-}
-
-/*
-class JsonEnum(val en:Any):JSonValue(){
-
-
-}
-
- */
-
-
-
-
-class JsonBoolean(b:Boolean): JSonValue(){
-
-    val valor=b
-
-    override fun serialize(): String{
-        if(valor){
-            return "true"
-        }
-        return "false"
-    }
-
-    override fun accept(v: Visitor) {
-        v.visit(this)
-    }
-
-}
-
-/*
-class JsonMap : JSonValue(){
-    val Mymap: MutableMap<String, JSonValue> = mutableMapOf()
-
-    fun addNew(s:String, js:JSonValue){
-        Mymap[s]=js
-    }
-
-    override fun serialize(): String {
-        var final=""
-        for((k,v) in Mymap){
-            final=final + k.toString() +": "+ v.serialize() + "\n"
-        }
-        return "{ " +"\n" + final + "\n" + "}"
-    }
-}
-
- */
-
-class JsonArray : JSonValue() {
-
-    val list: MutableList<JSonValue> = mutableListOf()
-
-    fun addElement(value: JSonValue) {
-        list.add(value)
-    }
-
-    fun contains(e: JSonValue): Boolean {
-        return e in list
-
-    }
-
-    override fun serialize(): String {
-        var lista2 = "["
-        list.forEach {
-            if (list.indexOf(it) == (list.size-1)) {
-                lista2 = lista2 + " " + it.serialize() +" "
-            }
-            else {
-
-                lista2 = lista2 + " " + it.serialize() + ","
-
-
-            }
-
-
-        }
-        return lista2 + "]"
-    }
-
-
-    fun searchFor(exp:(JSonValue)->Boolean): List<String>{
-    var final= mutableListOf<String>()
-        var r= mutableListOf<String>()
-       for (i in list){
-
-
-            if ((i is JsonArray)==false) {
-
-
-
-                    if(exp(i)==true) {
-                        final.add(i.serialize())
-
-                    }
-
-            }
-            else {
-                 r= i.searchFor(exp) as MutableList<String>
-            }
-
-        }
-
-
-    return final+r
-
-    }
-
-    override fun accept(v: Visitor) {
-        v.visit(this)
-        list.forEach{
-            it.accept(v)
-
-        }
-    }
-
-
-
-}
+annotation class Ignore
 
 interface Visitor{
     fun visit (s:JsonString):Boolean=true
@@ -230,169 +22,11 @@ interface Visitor{
     fun visit (f:JsonFloat):Boolean=true
     fun visit (d:JsonDouble):Boolean=true
     fun visit (c:JsonChar):Boolean=true
-    fun visit (jp:JsonPair):Boolean=true
+
     fun visit (n:JsonNull):Boolean=true
-    //fun visit (directoryElement: DirectoryElement):Boolean=true
-}
-
-class JsonPair(val a: String, val b:JSonValue) :JSonValue() {
-
-   override fun accept(v: Visitor) {
-       v.visit(this)
-   }
-
-    override fun serialize(): String {
-        return b.serialize()
-    }
-
-
 
 }
 
-class MyJsonObject() :JSonValue() {
-
-
-    //val newLista = mutableListOf<JsonPair>()
-    val map : MutableMap<String,JSonValue> = mutableMapOf()
-
-
-    fun addField(s: String, j: JSonValue) {
-        map[s]=j
-        //newLista.add(JsonPair(s, j))
-    }
-
-    override fun serialize(): String {
-
-        var resultado = ""
-        var count=1
-
-        for((k,v) in map) {
-
-            if (count < map.size) {
-
-                resultado = resultado + "\n" + "\"" + k.toString() + "\"" + ": " + v.serialize() + " , \n"
-                count++
-            }
-            else if (count==map.size){
-                resultado = resultado + "\n" + "\"" + k.toString() + "\"" + ": " + v.serialize() + "\n"
-            }
-        }
-        return "{ " +"\n" + resultado + "\n" + "}"
-
-
-    /*
-        newLista.forEach {
-            if (newLista.indexOf(it) == (newLista.size - 1)) {
-                resultado = resultado + "\n " + "\"" + it.a + "\"" + ": " + it.b.serialize() + "\n"
-            } else {
-
-
-                resultado = resultado + "\n " + "\"" + it.a + "\"" + ": " + it.b.serialize() + " , \n"
-            }
-
-        }
-
-
-     */
-
-
-    /*
-        var nova : KClass<Any> = newLista::class as KClass<Any>
-
-        resultado =
-            "\"" + nova.declaredMemberProperties.joinToString(separator = ",") { it.name }
-
-
-     */
-        return "{\n " + resultado + " \n}"
-
-    }
-
-        override fun accept(v: Visitor) {
-
-        v.visit(this)
-        for((x,y) in map){
-            accept(v)
-        }
-    }
-
-
-            /*
-        v.visit(this)
-       map.forEach{
-           accept(v)
-       }
-
-        }
-
-         */
-
-
-    fun searchFor(exp:(JSonValue)->Boolean): List<String> {
-        var final = mutableListOf<String>()
-        var r= mutableListOf<String>()
-
-        for((k,v) in map) {
-            if (v is JsonArray == false) {
-                if (exp(v)) {
-                    final.add(v.serialize())
-                }
-            }
-            else{
-                r=v.searchFor(exp) as MutableList<String>
-            }
-        }
-
-        /*
-
-        newLista.forEach {
-            if(it.b is JsonArray == false){
-                if(exp(it.b)){
-                    final.add(it.b.serialize())
-
-
-                }
-            }
-            else{
-                r= it.b.searchFor(exp) as MutableList<String>
-
-            }
-        }
-
-         */
-        return final+r
-/*
-        for (i in newLista){
-
-
-            if ((i is JsonArray)==false) {
-
-
-
-                if(exp(i)==true) {
-                    if (i.serialize() == e.serialize()) {
-
-                        return true
-                    }
-                }
-
-            }
-            else {
-                return i.searchFor(e,exp)
-            }
-
-        }
-        */
-
-
-
-
-
-    }
-
-
-
-}
 
 fun autoJson(a:Any?):JSonValue {
     var finalJson:JSonValue = JsonNull()
@@ -454,17 +88,6 @@ return finalJson
 
 }
 
-data class Student2(
-    @Ignore
-    val name: String,
-    val age: Int,
-    @ChangeName("Curso")
-    val course: String
-
-
-
-
-)
 
 
 fun main(){
@@ -500,7 +123,7 @@ fun main(){
 
     var new= jsonarray.searchFor(limite)
 
-    println(new)
+
 
 
     var newjsononbject = MyJsonObject()
@@ -508,8 +131,6 @@ fun main(){
     newjsononbject.addField("Palavra", jsonint)
     newjsononbject.addField("Palavra", jsonarray)
 
-    var jsonString3= JsonString("OI")
-    var clazz :KClass<Any> = jsonString3::class as KClass<Any>
 
 
 
@@ -517,22 +138,16 @@ fun main(){
 
 
 
-    println(newjsononbject.serialize())
-    println(newjsononbject.searchFor(limite))
+
 
     var teste= autoJson("OI")
     println(teste)
-    var teste2 = mutableListOf<Any>()
-    teste2.add("oi")
-    teste2.add("oi")
-    teste2.add(2)
+
+
+    var teste2 = Student2("João",21,"MEI")
+
 
     println(autoJson(teste2).serialize())
-
-    var teste3 = Student2("João",21,"MEI")
-
-
-    println(autoJson(teste3).serialize())
 
 
 
@@ -556,13 +171,12 @@ fun main(){
             a.serialize()
             return true
         }
-        /*
+
         override fun visit(mjo:MyJsonObject):Boolean{
             mjo.serialize()
             return true
         }
 
-         */
 
         override fun visit(f:JsonFloat):Boolean{
             f.serialize()
@@ -576,10 +190,7 @@ fun main(){
             c.serialize()
             return true
         }
-        override fun visit(jp:JsonPair):Boolean{
-            jp.serialize()
-            return true
-        }
+
 
         override fun visit(n:JsonNull):Boolean{
             n.serialize()
