@@ -32,7 +32,7 @@ class JsonArrayTest : TestCase(){
         var compare = "[ \"OI\", \"OI2\", 2, [ \"OI\", \"OI\", \"OI2\", 2 ] ]"
 
 
-        Assert.assertTrue(testerArray.serialize() == compare)
+        assertEquals(testerArray.serialize(), compare)
 
 
 
@@ -73,9 +73,9 @@ class JsonArrayTest : TestCase(){
 
 
 
-        Assert.assertTrue(testerArray.searchFor(limite) == compare1)
+        assertEquals(testerArray.searchFor(limite),compare1)
 
-        Assert.assertTrue(testerArray.searchFor(limite2) == compare2)
+        assertEquals(testerArray.searchFor(limite2),compare2)
 
 
 

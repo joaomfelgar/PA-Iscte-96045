@@ -1,23 +1,21 @@
 import org.junit.Test
+import org.omg.CORBA.Object
 import javax.print.DocFlavor
 import kotlin.reflect.KClass
 import kotlin.reflect.full.*
 import kotlin.reflect.typeOf
 
 @Target(AnnotationTarget.CLASS, AnnotationTarget.PROPERTY)
-annotation class JsonClass(
+annotation class ChangeName(
     val name:String
 
 )
-@Target(AnnotationTarget.FIELD)
-annotation class VALUE(
+@Target(AnnotationTarget.PROPERTY)
+annotation class Ignore(
 
 )
 
-@Target(AnnotationTarget.FUNCTION)
-annotation class FUN_NAME(
 
-)
 
 
 
@@ -26,32 +24,32 @@ abstract class JSonValue{
     abstract fun accept (v:Visitor)
 
 }
-@JsonClass("STRING")
+
 class JsonString(s:String): JSonValue(){
-    @VALUE
+
     val valor=s
 
-    @FUN_NAME
+
     override fun serialize(): String {
         return "\""+valor.toString()+"\""
     }
-    @FUN_NAME
+
     override fun accept(v: Visitor) {
         v.visit(this)
     }
 
 }
-@JsonClass("INT")
+
 class JsonInt(i:Int): JSonValue(){
-    @VALUE
+
     val valor=i
 
 
-    @FUN_NAME
+
     override fun serialize(): String {
         return valor.toString()
     }
-    @FUN_NAME
+
     override fun accept(v: Visitor) {
         v.visit(this)
     }
@@ -60,46 +58,46 @@ class JsonInt(i:Int): JSonValue(){
 }
 
 class JsonFloat (val f:Float):JSonValue(){
-    @FUN_NAME
+
     override fun serialize():String{
         return f.toString()
     }
-    @FUN_NAME
+
     override fun accept(v: Visitor) {
         v.visit(this)
     }
 }
 
 class JsonDouble (val d:Double):JSonValue(){
-    @FUN_NAME
+
     override fun serialize():String{
         return d.toString()
     }
-    @FUN_NAME
+
     override fun accept(v: Visitor) {
         v.visit(this)
     }
 }
 
 class JsonChar(val c: Char): JSonValue(){
-    @FUN_NAME
+
     override fun serialize(): String {
        return "\'"+c.toString()+"\'"
     }
-    @FUN_NAME
+
     override fun accept(v: Visitor) {
         v.visit(this)
     }
 }
 
 class JsonNull(): JSonValue(){
-    @VALUE
+
     val n= null
-    @FUN_NAME
+
     override fun serialize():String{
         return "NULL"
     }
-    @FUN_NAME
+
     override fun accept(v: Visitor) {
         v.visit(this)
     }
@@ -117,16 +115,16 @@ class JsonEnum(val en:Any):JSonValue(){
 
 
 class JsonBoolean(b:Boolean): JSonValue(){
-    @VALUE
+
     val valor=b
-    @FUN_NAME
+
     override fun serialize(): String{
         if(valor){
             return "true"
         }
         return "false"
     }
-    @FUN_NAME
+
     override fun accept(v: Visitor) {
         v.visit(this)
     }
@@ -151,20 +149,20 @@ class JsonMap : JSonValue(){
 }
 
  */
-@JsonClass("ARRAY")
+
 class JsonArray : JSonValue() {
-    @VALUE
+
     val list: MutableList<JSonValue> = mutableListOf()
-    @FUN_NAME
+
     fun addElement(value: JSonValue) {
         list.add(value)
     }
-    @FUN_NAME
+
     fun contains(e: JSonValue): Boolean {
         return e in list
 
     }
-    @FUN_NAME
+
     override fun serialize(): String {
         var lista2 = "["
         list.forEach {
@@ -183,7 +181,7 @@ class JsonArray : JSonValue() {
         return lista2 + "]"
     }
 
-    @FUN_NAME
+
     fun searchFor(exp:(JSonValue)->Boolean): List<String>{
     var final= mutableListOf<String>()
         var r= mutableListOf<String>()
@@ -250,25 +248,34 @@ class JsonPair(val a: String, val b:JSonValue) :JSonValue() {
 
 
 }
-@JsonClass("JSONOBJECT")
+
 class MyJsonObject() :JSonValue() {
 
-    @VALUE
+
     //val newLista = mutableListOf<JsonPair>()
     val map : MutableMap<String,JSonValue> = mutableMapOf()
 
-    @FUN_NAME
+
     fun addField(s: String, j: JSonValue) {
         map[s]=j
         //newLista.add(JsonPair(s, j))
     }
-    @FUN_NAME
+
     override fun serialize(): String {
 
         var resultado = ""
+        var count=1
 
-        for((k,v) in map){
-            resultado=resultado + "\n " + "\"" + k.toString() + "\"" + ": " +v.serialize() + " \n"
+        for((k,v) in map) {
+
+            if (count < map.size) {
+
+                resultado = resultado + "\n" + "\"" + k.toString() + "\"" + ": " + v.serialize() + " , \n"
+                count++
+            }
+            else if (count==map.size){
+                resultado = resultado + "\n" + "\"" + k.toString() + "\"" + ": " + v.serialize() + "\n"
+            }
         }
         return "{ " +"\n" + resultado + "\n" + "}"
 
@@ -300,7 +307,7 @@ class MyJsonObject() :JSonValue() {
         return "{\n " + resultado + " \n}"
 
     }
-    @FUN_NAME
+
         override fun accept(v: Visitor) {
 
         v.visit(this)
@@ -320,7 +327,7 @@ class MyJsonObject() :JSonValue() {
 
          */
 
-    @FUN_NAME
+
     fun searchFor(exp:(JSonValue)->Boolean): List<String> {
         var final = mutableListOf<String>()
         var r= mutableListOf<String>()
@@ -387,9 +394,76 @@ class MyJsonObject() :JSonValue() {
 
 }
 
+fun autoJson(a:Any?):JSonValue {
+    var finalJson:JSonValue = JsonNull()
+    if (a is String) {
+
+        finalJson = JsonString(a)
+    } else if (a is Int) {
+         finalJson = JsonInt(a)
+    } else if (a is Boolean) {
+        finalJson = JsonBoolean(a)
+
+    } else if (a is Double) {
+        finalJson = JsonDouble(a)
+    }
+    else if (a is Float) {
+        finalJson = JsonFloat(a)
+    }
+    else if (a is Char) {
+        finalJson = JsonChar(a)
+    }
+    else if (a is Collection<*>) {
+        finalJson = JsonArray()
+
+        a.forEach {
+            var novoJson= autoJson(it)
+            (finalJson as JsonArray).addElement(novoJson)
+        }
+    }
+
+    else if (a is Map<*,*>) {
+        finalJson = MyJsonObject()
+        for((k,v) in a){
+            (finalJson).addField(k.toString(), autoJson(v))
+        }
+    }
+
+    else if (a!!::class.isData){
+
+        finalJson=MyJsonObject()
+
+        var clazz :KClass<Any> = a::class as KClass<Any>
+        clazz.declaredMemberProperties.forEach {
+            if (it.hasAnnotation<ChangeName>()) {
+                (finalJson).addField(it.findAnnotation<ChangeName>()!!.name, autoJson(it.call(a)))
+            }
+            else if(it.hasAnnotation<Ignore>()){
+
+            }
+
+            else {
+                (finalJson).addField(it.name.toString(), autoJson(it.call(a)))
+            }
+        }
+    }
+
+return finalJson
 
 
 
+}
+
+data class Person(
+    @Ignore
+    val name: String,
+    val age: Int,
+    val height: Double,
+    @ChangeName("PESO")
+    val weight: Double,
+    val isAlive: Boolean,
+    val friends: MutableList<Person>
+)
 
 
 fun main(){
@@ -439,13 +513,25 @@ fun main(){
 
 
 
-    println(clazz.declaredMemberFunctions.joinToString(","){it.findAnnotation<FUN_NAME>().toString()})
-    println(clazz.declaredMemberProperties.joinToString(","){it.hasAnnotation<VALUE>().toString()})
+
 
 
     println(newjsononbject.serialize())
     println(newjsononbject.searchFor(limite))
 
+    var teste= autoJson("OI")
+    println(teste)
+    var teste2 = mutableListOf<Any>()
+    teste2.add("oi")
+    teste2.add("oi")
+    teste2.add(2)
+
+    println(autoJson(teste2).serialize())
+
+    var teste3 = Person("João",21,1.72,71.3,true, mutableListOf<Person>())
+
+
+    println(autoJson(teste3).serialize())
 
 
 

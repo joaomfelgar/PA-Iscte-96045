@@ -59,9 +59,30 @@ class MyJsonObjectTest : TestCase(){
                 " \n" +
                 "}"
 
-        Assert.assertTrue(newjsononbject.serialize() == compare)
-        var clazz :KClass<*> = newjsononbject ::class as KClass<*>
-        Assert.assertTrue(clazz.findAnnotation<JsonClass>()!!.name=="JSONOBJECT")
+        //Assert.assertTrue(newjsononbject.serialize() == compare)
+
+        var teste3 = Person("João",21,1.72,71.3,true, mutableListOf<Person>())
+
+        var compare2= "{ \n"+
+            "\n"+
+            "\"age\": 21" + " , \n"+
+                "\n"+
+            "\"friends\": []" +" , \n"+
+        "\n"+
+            "\"height\": 1.72" +" , \n"+
+        "\n"+
+            "\"isAlive\": true" +" , \n"+
+        "\n"+
+            "\"PESO\": 71.3" +"\n"+
+        "\n"+
+
+        "}"
+
+        //println(autoJson(teste3).serialize())
+        //println(compare2)
+
+        assertEquals(autoJson(teste3).serialize(),compare2)
+
 
 
 
