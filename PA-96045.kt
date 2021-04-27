@@ -454,15 +454,16 @@ return finalJson
 
 }
 
-data class Person(
+data class Student2(
     @Ignore
     val name: String,
     val age: Int,
-    val height: Double,
-    @ChangeName("PESO")
-    val weight: Double,
-    val isAlive: Boolean,
-    val friends: MutableList<Person>
+    @ChangeName("Curso")
+    val course: String
+
+
+
+
 )
 
 
@@ -528,7 +529,7 @@ fun main(){
 
     println(autoJson(teste2).serialize())
 
-    var teste3 = Person("João",21,1.72,71.3,true, mutableListOf<Person>())
+    var teste3 = Student2("João",21,"MEI")
 
 
     println(autoJson(teste3).serialize())

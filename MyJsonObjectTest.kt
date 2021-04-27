@@ -61,19 +61,14 @@ class MyJsonObjectTest : TestCase(){
 
         //Assert.assertTrue(newjsononbject.serialize() == compare)
 
-        var teste3 = Person("João",21,1.72,71.3,true, mutableListOf<Person>())
+        var teste3 = Student2("João",21,"MEI")
 
         var compare2= "{ \n"+
             "\n"+
             "\"age\": 21" + " , \n"+
                 "\n"+
-            "\"friends\": []" +" , \n"+
-        "\n"+
-            "\"height\": 1.72" +" , \n"+
-        "\n"+
-            "\"isAlive\": true" +" , \n"+
-        "\n"+
-            "\"PESO\": 71.3" +"\n"+
+            "\"Curso\": \"MEI\"" +"\n"+
+
         "\n"+
 
         "}"
