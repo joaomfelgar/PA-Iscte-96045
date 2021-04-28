@@ -63,6 +63,11 @@ fun autoJson(a:Any?):JSonValue {
             (finalJson).addField(k.toString(), autoJson(v))
         }
     }
+    else if(a is Enum<*>){
+        finalJson=JsonString(a.toString())
+
+
+    }
 
     else if (a!!::class.isData){
 
@@ -88,7 +93,12 @@ return finalJson
 
 
 }
+enum class Teste(val x: Int){
+    OI(3),
+    XAU(2),
+    oi(1)
 
+}
 
 
 fun main(){
@@ -149,6 +159,10 @@ fun main(){
 
 
     println(autoJson(teste2).serialize())
+    var testar= Teste.OI.x
+    println(autoJson(testar).serialize())
+
+
 
 
 
